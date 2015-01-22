@@ -6,24 +6,30 @@
 /*   By: mdiouf <mdiouf@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/19 14:40:05 by mdiouf            #+#    #+#             */
-/*   Updated: 2015/01/22 18:30:37 by mdiouf           ###   ########.fr       */
+/*   Updated: 2015/01/22 21:12:07 by mdiouf           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "fdf.h"
 #include "get_next_line.h"
 #include "libft/includes/libft.h"
 #include <stdio.h>
 #include <fcntl.h>
+#include <mlx.h>
 
-//#include <mlx.h>
-//#include <stdio.h>
+int			free_split_line(char ***split, char **line)
+{
+	free(*split);
+	free(*line);
+	return (-1);
+}
+
 int			ft_valid_number(char **line, int *nb)
 {
 	int		i;
 	int		j;
 	char	**split;
 
-	split = NULL;
 	split = ft_strsplit(*line, ' ');
 	i = 0;
 	j = 0;
@@ -33,24 +39,70 @@ int			ft_valid_number(char **line, int *nb)
 		{
 			if (split[i][j] != ' ' && split[i][j] != '\n' &&
 				(split[i][j] < 48 || split[i][j] > 57))
-			{
-				free(*line);
-				free(split);
-				return (-1);
-			}
+				return (free_split_line(&split, line));
 			j++;
 		}
 		j = 0;
 		i++;
 	}
 	if ((*nb != 0) && *nb != i)
-	{
-		free(*line);
-		free(split);
-		return (-1);
-	}
+		return (free_split_line(&split, line));
 	*nb = i;
 	return (0);
+}
+
+void	array_creation(t_main *m)
+{
+	m->i = 0; //	create data_int to store double array of table converted to int
+	(m->data_int) = malloc(sizeof(int*) * m->lines);
+	while (m->i != m->lines)
+	{
+		(m->data_int)[m->i] = malloc(sizeof(int) * m->nb);
+		(m->i)++;
+	}
+	(m->data_int)[m->i] = NULL;
+	(m->data_char) = ft_strsplit(m->join_lines, '\n'); // split join_lines
+	m->i = 0;
+	while ((m->data_char)[m->i] != NULL) //	split individual numbers and stick em into new data_int array
+	{
+		(m->data_nb) = ft_strsplit((m->data_char)[m->i], ' ');
+		while ((m->data_nb)[m->j] != NULL)
+		{
+			(m->data_int)[m->i][m->j] = ft_atoi((m->data_nb)[m->j]);
+			(m->j)++;
+		}
+		m->j = 0;
+		free((m->data_nb));
+		(m->data_nb) = NULL;
+		(m->i)++;
+	}
+}
+
+void	init_main(t_main *m, t_gfx *g)
+{
+	m->fd = open("test", O_RDONLY);
+	m->nb = 0;
+	m->i = 0;
+	m->j = 0;
+	m->lines = 0;
+	m->line = NULL;
+	m->join_lines = NULL;
+	m->data_nb = NULL;
+	m->data_int = NULL;
+	m->data_char = NULL;
+	g->mlx = NULL;
+	g->win = NULL;
+	g->img = NULL;
+	g->bng_img = NULL;
+	g->bit_pp = 0;
+	g->size = 0;
+	g->endian = 0;
+	g->k = 0;
+	g->bpx = &(g->bit_pp);
+	g->sz_ln = &(g->size);
+	g->ndian = &(g->endian);
+	g->n = 128;
+	g->color = 0;
 }
 
 int	main(int argc, char **argv)
@@ -117,67 +169,30 @@ while (map[y])
 	y++;
 }
  */
-	int			fd;
-	int			nb;
-	int			i;
-	int			j;
-	int			**data_int;
-	char		**data_char;
-	char		**data_nb;
-	char		lines;
-	char		*line;
-	char		*join_lines;
+	t_main		m;
+	t_gfx		g;
 
-	fd = open("test", O_RDONLY);
-	nb = 0;
-	j = 0;
-	lines = 0;
-	line = NULL;
-	join_lines = NULL;
-	data_nb = NULL;
-//	read entire file check if same amount of int per lines and store all that is read
-	while (get_next_line(fd, &line) != 0)
+	init_main(&m, &g); //	read entire file check if same amount of int per lines and store all that is read
+	while (get_next_line(m.fd, &m.line) != 0)
 	{
-		if (ft_valid_number(&line, &nb) != -1)
+		if (ft_valid_number(&m.line, &(m.nb)) != -1)
 		{
-			join_lines = ft_strjoin(join_lines, "\n");
-			join_lines = ft_strjoin(join_lines, line);
+			m.join_lines = ft_strjoin(m.join_lines, "\n");
+			m.join_lines = ft_strjoin(m.join_lines, m.line);
 		}
 		else
 		{
 			ft_putstr_fd("Error\n", 2);
 			return (-1);
 		}
-		lines++;
-		if (line != NULL)
-			free(line);
+		m.lines++;
+		if (m.line != NULL)
+			free(m.line);
 	}
-//	create data_int to store double array of table converted to int
-	i = 0;
-	data_int = malloc(sizeof(int*) * lines);
-	while (i != lines)
-	{
-		data_int[i] = malloc(sizeof(int) * nb);
-		i++;
-	}
-	data_int[i] = NULL;
-// split join_lines
-	data_char = ft_strsplit(join_lines, '\n');
-	i = 0;
-//	split individual numbers and stick em into new data_int array
-	while (data_char[i] != NULL)
-	{
-		data_nb = ft_strsplit(data_char[i], ' ');
-		while (data_nb[j] != NULL)
-		{
-			data_int[i][j] = ft_atoi(data_nb[j]);
-			j++;
-		}
-		j = 0;
-		free(data_nb);
-		data_nb = NULL;
-		i++;
-	}
+	array_creation(&m);
+	return (0);
+}
+
 /* test data_int
 	i = 0;
 	while (data_int[i] != NULL)
@@ -193,5 +208,3 @@ while (map[y])
 		i++;
 	}
 */
-	return (0);
-}
