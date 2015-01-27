@@ -6,7 +6,7 @@
 /*   By: mdiouf <mdiouf@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/19 14:40:05 by mdiouf            #+#    #+#             */
-/*   Updated: 2015/01/22 21:12:07 by mdiouf           ###   ########.fr       */
+/*   Updated: 2015/01/27 15:29:13 by mdiouf           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,6 +85,7 @@ void	init_main(t_main *m, t_gfx *g)
 	m->i = 0;
 	m->j = 0;
 	m->lines = 0;
+	m->start = NULL;
 	m->line = NULL;
 	m->join_lines = NULL;
 	m->data_nb = NULL;
@@ -93,7 +94,7 @@ void	init_main(t_main *m, t_gfx *g)
 	g->mlx = NULL;
 	g->win = NULL;
 	g->img = NULL;
-	g->bng_img = NULL;
+	g->add_img = NULL;
 	g->bit_pp = 0;
 	g->size = 0;
 	g->endian = 0;
@@ -103,6 +104,185 @@ void	init_main(t_main *m, t_gfx *g)
 	g->ndian = &(g->endian);
 	g->n = 128;
 	g->color = 0;
+}
+
+void	create_new_elem(t_info *inf, t_main **m)
+{
+	t_list	*elem;
+	t_list	*temp;
+
+	elem = malloc(sizeof(t_list));
+	elem->x_1.x = (inf->x * inf->x_incr);
+	elem->x_1.y = (inf->y * inf->y_incr);
+	elem->x_2.x = ((inf->x + 1) * inf->x_incr);
+	elem->x_2.y = (inf->y * inf->y_incr);
+	elem->x_3.x = (inf->x  * inf->x_incr);
+	elem->x_3.y = ((inf->y + 1) * inf->y_incr);
+	elem->x_4.x = ((inf->x + 1)  * inf->x_incr);
+	elem->x_4.y = ((inf->y + 1) * inf->y_incr);
+	elem->height = inf->height;
+	if (inf->x == 0 && inf->y == 0)
+	{
+		elem->prev = NULL;
+		elem->next = NULL;
+		(*m)->start = elem;
+	}
+	else
+	{
+		temp = (*m)->start;
+		if (temp->next == NULL)
+		{
+			temp->next = elem;
+			temp->prev = elem;
+			elem->next = temp;
+			elem->prev = temp;
+		}
+		else
+		{
+			temp = temp->next;
+			while (temp->next != (*m)->start)
+				temp = temp->next;
+			temp->next = elem;
+			elem->prev = temp;
+			elem->next = (*m)->start;
+			(*m)->start->prev = elem;
+		}
+	}
+}
+
+void	create_list(t_main *m, t_gfx *g)
+{
+	int		x;
+	int		y;
+	int		x_incr;
+	int		y_incr;
+	t_info	inf;
+	t_list	*temp;
+
+	x = 0;
+	y = 0;
+	x_incr = SCR_X / m->nb;
+	y_incr = SCR_Y / m->lines;
+//x1 = pos = x * xincrement, y * yincrement
+//x2 = pos = (x + 1) * xincrement, y * yincrement
+//x3 = pos = x * xincrement, (y + 1) * yincrement
+//x4 = pos = (x + 1) * xincrement, y * yincrement
+	printf("lines: %d  nb: %d\n", m->lines, m->nb);
+	while (y != m->lines)
+	{
+		while (x != m->nb)
+		{
+			inf.x = x;
+			inf.y = y;
+			inf.x_incr = x_incr;
+			inf.y_incr = y_incr;
+			inf.height = (m->data_int)[y][x];
+			printf("X: %d Y: %d Height: %d\n", x, y, inf.height);
+			create_new_elem(&inf , &m);
+			x++;
+		}
+		x = 0;
+		y++;
+	}
+	temp = m->start;
+	printf("x_1.x %d\n", temp->x_1.x);
+	printf("x_1.y %d\n", temp->x_1.y);
+	printf("x_2.x %d\n", temp->x_2.x);
+	printf("x_2.y %d\n", temp->x_2.y);
+	printf("x_3.x %d\n", temp->x_3.x);
+	printf("x_3.y %d\n", temp->x_3.y);
+	printf("x_4.x %d\n", temp->x_4.x);
+	printf("x_4.y %d\n", temp->x_4.y);
+	printf("height %d\n", temp->height);
+	temp = temp->next;
+	while (temp != m->start)
+	{
+		printf("x_1.x %d\n", temp->x_1.x);
+		printf("x_1.y %d\n", temp->x_1.y);
+		printf("x_2.x %d\n", temp->x_2.x);
+		printf("x_2.y %d\n", temp->x_2.y);
+		printf("x_3.x %d\n", temp->x_3.x);
+		printf("x_3.y %d\n", temp->x_3.y);
+		printf("x_4.x %d\n", temp->x_4.x);
+		printf("x_4.y %d\n", temp->x_4.y);
+		printf("height %d\n", temp->height);
+		temp = temp->next;
+	}
+}
+
+void	init_gfx(t_main *m, t_gfx *g)
+{
+	int	x = m->nb * 10;
+	int	y = m->lines * 10;
+	int	i = 0;
+	char *temp;
+	g->mlx = mlx_init();
+	g->win = mlx_new_window(g->mlx, SCR_X , SCR_Y, "mywindow");
+	g->img = mlx_new_image(g->mlx, SCR_X, SCR_Y);
+//	printf("x: %d, y: %d \n", x, y);
+	g->add_img = mlx_get_data_addr(g->img, g->bpx, g->sz_ln, g->ndian);
+	temp = g->add_img;
+//	printf("lines: %d, nb: %d bpx: %d, sz_ln: %d, size: %d\n", m->lines, m->nb, *g->bpx, *g->sz_ln, g->size);
+	while (1)
+	{
+// print tiles
+//calculate x1 x2 x3 x4
+//x1 = pos = x * xincrement, y * yincrement
+//x2 = pos = (x + 1) * xincrement, y * yincrement
+//x3 = pos = x * xincrement, (y + 1) * yincrement
+//x4 = pos = (x + 1) * xincrement, y * yincrement
+//if first tile first row
+//print x1 x2 x3 x4
+//if first tile not first row
+//print x3 x4
+// else
+//print x2 x4
+		printf("x_1.x: %d, x_1.y: %d, x_2.x: %d, x_2.y: %d, x_3.x: %d x_4.x: %d x_4.y: %d\n", m->start->x_1.x, m->start->x_1.y, m->start->x_2.x, m->start->x_2.y, m->start->x_3.x, m->start->x_3.y, m->start->x_4.x, m->start->x_4.y);
+		i = (*(g->bpx) * (m->start->x_1.x)) + (*(g->sz_ln) * (m->start->x_1.y));
+		temp = temp += i;
+		*temp = 255;
+		temp++;
+		*temp = 0;
+		temp++;
+		*temp = 255;
+		temp = g->add_img;
+		i = (*(g->bpx) * (m->start->x_2.x / 4)) + (*(g->sz_ln) * (m->start->x_2.y));
+		temp = temp += i;
+		*temp = 255;
+		temp++;
+		*temp = 0;
+		temp++;
+		*temp = 255;
+		temp = g->add_img;
+		i = (*(g->bpx) * (m->start->x_3.x / 4)) + (*(g->sz_ln) * (m->start->x_3.y));
+		temp = temp += i;
+		*temp = 255;
+		temp++;
+		*temp = 0;
+		temp++;
+		*temp = 255;
+		temp = g->add_img;
+		i = (*(g->bpx) * (m->start->x_4.x / 4)) + (*(g->sz_ln) * (m->start->x_4.y));
+		temp = temp += i;
+		*temp = 255;
+		temp++;
+		*temp = 0;
+		temp++;
+		*temp = 255;
+//		printf("%d\n", (g->bpx * start->x_1.x) + (g->sz_ln * start->x_1.y));
+		mlx_put_image_to_window(g->mlx, g->win, g->img, 0, 0);
+//		printf("m->j - (sz_ln * 2): %d\n", m->j - (*(g->sz_ln) * 2));
+		sleep(100);
+	}
+//	while (m->i != 25000)
+//	{
+//		if (m->j - (g->sz_ln * 2) >= 0)
+//			if (data_int[m->j - (sz_ln * 2)]
+//		*(g->add_img) = 255;
+//		(g->add_img)++;
+//		(m->i)++;
+//			printf("%d\n", *bgn_img);
+//	}
 }
 
 int	main(int argc, char **argv)
@@ -190,9 +370,23 @@ while (map[y])
 			free(m.line);
 	}
 	array_creation(&m);
+	m.i = 0;
+	while ((m.data_int)[m.i] != NULL)
+	{
+		printf("Data_int[%d]: ", m.i);
+		while (m.j != m.nb)
+		{
+			printf("%d ", (m.data_int)[m.i][m.j]);
+			(m.j)++;
+		}
+		m.j = 0;
+		printf("\n");
+		(m.i)++;
+	}
+	create_list(&m, &g);
+	init_gfx(&m, &g);
 	return (0);
 }
-
 /* test data_int
 	i = 0;
 	while (data_int[i] != NULL)
