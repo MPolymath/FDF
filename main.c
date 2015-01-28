@@ -6,7 +6,7 @@
 /*   By: mdiouf <mdiouf@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/19 14:40:05 by mdiouf            #+#    #+#             */
-/*   Updated: 2015/01/22 21:12:07 by mdiouf           ###   ########.fr       */
+/*   Updated: 2015/01/28 21:36:45 by mdiouf           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,6 +85,7 @@ void	init_main(t_main *m, t_gfx *g)
 	m->i = 0;
 	m->j = 0;
 	m->lines = 0;
+	m->start = NULL;
 	m->line = NULL;
 	m->join_lines = NULL;
 	m->data_nb = NULL;
@@ -93,7 +94,7 @@ void	init_main(t_main *m, t_gfx *g)
 	g->mlx = NULL;
 	g->win = NULL;
 	g->img = NULL;
-	g->bng_img = NULL;
+	g->add_img = NULL;
 	g->bit_pp = 0;
 	g->size = 0;
 	g->endian = 0;
@@ -103,6 +104,243 @@ void	init_main(t_main *m, t_gfx *g)
 	g->ndian = &(g->endian);
 	g->n = 128;
 	g->color = 0;
+}
+
+void	cr_frst(t_main **m, t_list **elem)
+{
+	(*elem)->prev = NULL;
+	(*elem)->next = NULL;
+	(*m)->start = *elem;
+}
+
+void	if_nt_frst(t_list **elem, t_list **temp, t_main **m)
+{
+	*temp = (*m)->start;
+	if ((*temp)->next == NULL)
+	{
+		(*temp)->next = *elem;
+		(*temp)->prev = *elem;
+		(*elem)->next = *temp;
+		(*elem)->prev = *temp;
+	}
+	else
+	{
+		*temp = (*temp)->next;
+		while ((*temp)->next != (*m)->start)
+			*temp = (*temp)->next;
+		(*temp)->next = *elem;
+		(*elem)->prev = *temp;
+		(*elem)->next = (*m)->start;
+		(*m)->start->prev = *elem;
+	}
+}
+
+void	create_new_elem(t_info *inf, t_main **m)
+{
+	t_list	*elem;
+	t_list	*temp;
+
+	elem = malloc(sizeof(t_list));
+	elem->x_1.x = (inf->x * inf->x_incr);
+	elem->x_1.y = (inf->y * inf->y_incr);
+	elem->x_2.x = ((inf->x + 1) * inf->x_incr);
+	elem->x_2.y = (inf->y * inf->y_incr);
+	elem->x_3.x = (inf->x  * inf->x_incr);
+	elem->x_3.y = ((inf->y + 1) * inf->y_incr);
+	elem->x_4.x = ((inf->x + 1)  * inf->x_incr);
+	elem->x_4.y = ((inf->y + 1) * inf->y_incr);
+	elem->height = inf->height;
+	if (inf->x == 0 && inf->y == 0)
+		cr_frst(m, &elem);
+	else
+		if_nt_frst(&elem, &temp, m);
+}
+
+void		print_xs_b(t_list **temp)
+{
+	ft_putstr("x_3.x ");
+	ft_putnbr((*temp)->x_1.x);
+	ft_putstr(" ");
+	ft_putstr("x_3.y ");
+	ft_putnbr((*temp)->x_3.y);
+	ft_putstr(" ");
+	ft_putstr("x_4.x ");
+	ft_putnbr((*temp)->x_4.y);
+	ft_putstr(" ");
+	ft_putstr("x_4.y ");
+	ft_putnbr((*temp)->x_4.y);
+	ft_putstr(" ");
+	ft_putstr("height ");
+	ft_putnbr((*temp)->height);
+	ft_putstr("\n");
+}
+
+void		print_xs(t_list **temp)
+{
+	ft_putstr("x_1.x ");
+	ft_putnbr((*temp)->x_1.x);
+	ft_putstr(" ");
+	ft_putstr("x_1.y ");
+	ft_putnbr((*temp)->x_1.y);
+	ft_putstr(" ");
+	ft_putstr("x_2.x ");
+	ft_putnbr((*temp)->x_2.x);
+	ft_putstr(" ");
+	ft_putstr("x_2.y ");
+	ft_putnbr((*temp)->x_2.y);
+	ft_putstr(" ");
+	print_xs_b(temp);
+}
+
+void		print_list(t_main **m)
+{
+	t_list	*temp;
+
+	temp = (*m)->start;
+	print_xs(&temp);
+	temp = temp->next;
+	while (temp != (*m)->start)
+	{
+		print_xs(&temp);
+		temp = temp->next;
+	}
+}
+
+void	create_list(t_main *m, t_gfx *g)
+{
+	int		x;
+	int		y;
+	int		x_incr;
+	int		y_incr;
+	t_info	inf;
+
+	x = 0;
+	y = 0;
+	x_incr = (SCR_X / (m->nb));
+	y_incr = SCR_Y / (m->lines);
+	while (y != m->lines)
+	{
+		while (x != m->nb)
+		{
+			inf.x = x;
+			inf.y = y;
+			inf.x_incr = x_incr;
+			inf.y_incr = y_incr;
+			inf.height = (m->data_int)[y][x];
+			create_new_elem(&inf , &m);
+			x++;
+		}
+		x = 0;
+		y++;
+	}
+//	print_list(&m);
+}
+
+void		tile_dots(t_main **m, t_gfx **g, t_color **col, t_pos *x, int height)
+{
+	char	*temp;
+	int		i;
+	int		sx;
+	int		sy;
+
+	sx = (500 * (x->x - 500)) / (500 + (10) + 500);
+	sx += 253;
+	sy = (500 * (x->y - 500)) / (500 + x->y + 500);
+	sy += 250;
+	printf("sx: %d sy: %d\n", sx, sy);
+	if (sx < 0 || sy < 0)
+		return;
+	temp = (*g)->add_img;
+	i = (*((*g)->bpx) / 8) * ((x->x)) + (((*(*g)->sz_ln)) * ((x->y)));
+	temp = temp += i;
+	*temp = (*col)->b;
+	temp++;
+	*temp = (*col)->g;
+	temp++;
+	*temp = (*col)->r;
+	temp = (*g)->add_img;
+}
+
+
+void	corners(t_main **m, t_gfx **g, t_list **node, t_color **col)
+{
+	if ((*node)->height == 0)
+	{
+		(*col)->r = 255;
+		(*col)->g = 0;
+		(*col)->b = 255;
+	}
+	else
+	{
+		(*col)->r = 0;
+		(*col)->g = 0;
+		(*col)->b = 255;
+	}
+	tile_dots(m, g, col, &((*node)->x_1), (*node)->height);
+	tile_dots(m, g, col, &((*node)->x_2), (*node)->height);
+	tile_dots(m, g, col, &((*node)->x_3), (*node)->height);
+	tile_dots(m, g, col, &((*node)->x_4), (*node)->height);
+	*node = (*node)->next;
+}
+
+void	draw(t_main **m, t_gfx **g, t_list **node, t_color *col)
+{
+	int	i;
+
+	i = 0;
+	while (1)
+	{
+// print tiles
+//calculate x1 x2 x3 x4
+//x1 = pos = x * xincrement, y * yincrement
+//x2 = pos = (x + 1) * xincrement, y * yincrement
+//x3 = pos = x * xincrement, (y + 1) * yincrement
+//x4 = pos = (x + 1) * xincrement, y * yincrement
+//if first tile first row
+//print x1 x2 x3 x4
+//if first tile not first row
+//print x3 x4
+// else
+//print x2 x4
+//		while (i != 9)
+//		{
+//			(*node) = (*node)->next;
+//			i++;
+//			if (i == 9)
+//				break;
+//		}
+//		printf("x_1: %d,%d x_2: %d,%d x_3: %d,%d x_4: %d,%d\n", (*node)->x_1.x, (*node)->x_1.y, (*node)->x_2.x, (*node)->x_2.y, (*node)->x_3.x, (*node)->x_3.y, (*node)->x_4.x, (*node)->x_4.y);
+		corners(m, g, node, &col);
+		while (*node != (*m)->start)
+//		{
+			corners(m, g, node, &col);
+//		}
+		mlx_put_image_to_window((*g)->mlx, (*g)->win, (*g)->img, 0, 0);
+//		printf("m->j - (sz_ln * 2): %d\n", m->j - (*(g->sz_ln) * 2));
+		sleep(100);
+	}
+}
+
+void	init_gfx(t_main *m, t_gfx *g)
+{
+	int		x = m->nb * 10;
+	int		y = m->lines * 10;
+	int		i = 0;
+	t_color	color1;
+	char 	*temp;
+	t_list	*node;
+
+	g->mlx = mlx_init();
+	g->win = mlx_new_window(g->mlx, SCR_X , SCR_Y, "mywindow");
+	g->img = mlx_new_image(g->mlx, SCR_X, SCR_Y);
+//	printf("x: %d, y: %d \n", x, y);
+	g->add_img = mlx_get_data_addr(g->img, g->bpx, g->sz_ln, g->ndian);
+	temp = g->add_img;
+	node = m->start;
+	color1.r = 255;
+	color1.g = 0;
+	color1.b = 255;
+	draw(&m, &g, &node, &color1);
 }
 
 int	main(int argc, char **argv)
@@ -190,9 +428,23 @@ while (map[y])
 			free(m.line);
 	}
 	array_creation(&m);
+	m.i = 0;
+	while ((m.data_int)[m.i] != NULL)
+	{
+		printf("Data_int[%d]: ", m.i);
+		while (m.j != m.nb)
+		{
+			printf("%d ", (m.data_int)[m.i][m.j]);
+			(m.j)++;
+		}
+		m.j = 0;
+		printf("\n");
+		(m.i)++;
+	}
+	create_list(&m, &g);
+	init_gfx(&m, &g);
 	return (0);
 }
-
 /* test data_int
 	i = 0;
 	while (data_int[i] != NULL)
