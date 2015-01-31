@@ -6,7 +6,7 @@
 /*   By: mdiouf <mdiouf@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/19 14:40:05 by mdiouf            #+#    #+#             */
-/*   Updated: 2015/01/28 21:36:45 by mdiouf           ###   ########.fr       */
+/*   Updated: 2015/01/31 15:42:22 by mdiouf           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #include "get_next_line.h"
 #include "libft/includes/libft.h"
 #include <stdio.h>
+#include <math.h>
 #include <fcntl.h>
 #include <mlx.h>
 
@@ -236,29 +237,163 @@ void	create_list(t_main *m, t_gfx *g)
 //	print_list(&m);
 }
 
-void		tile_dots(t_main **m, t_gfx **g, t_color **col, t_pos *x, int height)
+void		draw_lines(t_color *col, t_gfx **g, t_pos *t, t_pos *t2)
+{
+	int		x;
+	int		y;
+	int		i;
+	char	*temp;
+
+	i = 0;
+	x = t->x;
+	printf("TOTO\n");
+	if ((t->x <= t2->x) && ((t2->x - t->x) >= fabs((double)(t2->y - t->y))))
+	{
+		while (1)
+		{
+			if ((t->y - t2->y) < 0)
+			{
+//				x = t2->x;
+				printf("case1\n");
+				while (x <= t2->x)
+				{
+					temp = (*g)->add_img;
+					i = (*((*g)->bpx) / 8) * ((x)) + ((*(*g)->sz_ln) * (((t2->y - t->y) / (t2->x - t->x)) * (x - t->x) + t->y)); // only change
+					temp = temp += i;
+					*temp = col->b;
+					temp++;
+					*temp = col->g;
+					temp++;
+					*temp = col->r;
+					temp = (*g)->add_img;
+					x++;
+					mlx_put_image_to_window((*g)->mlx, (*g)->win, (*g)->img, 0, 0);
+//					sleep(1);
+				}
+
+			}
+			else
+			{
+				printf("case2\n");
+				while (x <= t2->x)
+				{
+					temp = (*g)->add_img;
+					i = (*((*g)->bpx) / 8) * ((x)) + ((*(*g)->sz_ln) * (((t2->y - t->y) / (t2->x - t->x)) * (x - t->x) + t->y)); // only change
+//					i = (*((*g)->bpx) / 8) * ((x)) + (((*(*g)->sz_ln)) * ((t->y + ((t2->y) - (t->y)) * (x - t2->x))/((t2->x) - (t->x)))); // only change
+					printf("i2: %d\n", i);
+					temp = temp += i;
+					*temp = col->b;
+					temp++;
+					*temp = col->g;
+					temp++;
+					*temp = col->r;
+					temp = (*g)->add_img;
+					x++;
+					mlx_put_image_to_window((*g)->mlx, (*g)->win, (*g)->img, 0, 0);
+//					sleep(1);
+				}
+
+			}
+			sleep(200);
+		}
+	}
+	else if ((t->x > t2->x) && ((t->x - t2->x) >= fabs((double)(t->y - t2->y))))
+	{
+		printf("caseeeeee 2\n");
+		while (1)
+		{
+			if ((t->y - t2->y) < 0)
+			{
+//				x = t2->x;
+				while (x > t2->x)
+				{
+					temp = (*g)->add_img;
+					i = (*((*g)->bpx) / 8) * ((x)) + ((*(*g)->sz_ln) * (((t2->y - t->y) / (t2->x - t->x)) * (x - t->x) + t->y)); // only change
+					printf("i: %d\n", i);
+					temp = temp += i;
+					*temp = col->b;
+					temp++;
+					*temp = col->g;
+					temp++;
+					*temp = col->r;
+					temp = (*g)->add_img;
+					x--;
+					mlx_put_image_to_window((*g)->mlx, (*g)->win, (*g)->img, 0, 0);
+//					sleep(1);
+				}
+
+			}
+			else
+			{
+				while (x > t2->x)
+				{
+					temp = (*g)->add_img;
+					i = (*((*g)->bpx) / 8) * ((x)) + (((*(*g)->sz_ln)) * ((t->y + ((t2->y) - (t->y)) * (x - t2->x))/((t2->x) - (t->x)))); // only change
+					printf("i2: %d\n", i);
+					temp = temp += i;
+					*temp = col->b;
+					temp++;
+					*temp = col->g;
+					temp++;
+					*temp = col->r;
+					temp = (*g)->add_img;
+					x--;
+					mlx_put_image_to_window((*g)->mlx, (*g)->win, (*g)->img, 0, 0);
+//					sleep(1);
+				}
+
+			}
+			sleep(200);
+		}
+	}
+	else
+	{
+		printf("ERROR101\n");
+		y = t->y;
+		while (y > t2->y)
+		{
+			temp = (*g)->add_img;
+//			i = (*((*g)->bpx) / 8) * (((t2->x - t->x) / (t2->y - t->y)) * (y - t->y) + t->x) + ((*(*g)->sz_ln) * (y)); // only change
+//			i = (*((*g)->bpx) / 8) * ((y)) + ((*(*g)->sz_ln) * (((t2->x - t->x) / (t2->y - t->y)) * (y - t->y) + t->x)); // only change
+			i = (*((*g)->bpx) / 8) * ((y)) + ((*(*g)->sz_ln) * (((t2->x - t->x) / (t2->y - t->y)) * (y - t->y) + t->x)); // only change
+			printf("%d\n", i);
+			temp = temp += i;
+			*temp = col->b;
+			temp++;
+			*temp = col->g;
+			temp++;
+			*temp = col->r;
+			temp = (*g)->add_img;
+			y--;
+			mlx_put_image_to_window((*g)->mlx, (*g)->win, (*g)->img, 0, 0);
+		}
+		sleep(100);
+	}
+}
+
+void		tile_dots(t_main **m, t_gfx **g, t_color **col, t_list **node)
 {
 	char	*temp;
 	int		i;
 	int		sx;
 	int		sy;
 
-	sx = (500 * (x->x - 500)) / (500 + (10) + 500);
+	sx = (500 * (((*node)->x_1.x) - 500)) / (500 + (10) + 500);
 	sx += 253;
-	sy = (500 * (x->y - 500)) / (500 + x->y + 500);
+	sy = (500 * (((*node)->x_1.y) - 500)) / (500 + ((*node)->x_1.y) + 500);
 	sy += 250;
 	printf("sx: %d sy: %d\n", sx, sy);
 	if (sx < 0 || sy < 0)
 		return;
-	temp = (*g)->add_img;
-	i = (*((*g)->bpx) / 8) * ((x->x)) + (((*(*g)->sz_ln)) * ((x->y)));
-	temp = temp += i;
-	*temp = (*col)->b;
-	temp++;
-	*temp = (*col)->g;
-	temp++;
-	*temp = (*col)->r;
-	temp = (*g)->add_img;
+//	temp = (*g)->add_img;
+//	i = (*((*g)->bpx) / 8) * ((x->x)) + (((*(*g)->sz_ln)) * ((x->y)));
+//	temp = temp += i;
+//	*temp = (*col)->b;
+//	temp++;
+//	*temp = (*col)->g;
+//	temp++;
+//	*temp = (*col)->r;
+//	temp = (*g)->add_img;
 }
 
 
@@ -276,10 +411,7 @@ void	corners(t_main **m, t_gfx **g, t_list **node, t_color **col)
 		(*col)->g = 0;
 		(*col)->b = 255;
 	}
-	tile_dots(m, g, col, &((*node)->x_1), (*node)->height);
-	tile_dots(m, g, col, &((*node)->x_2), (*node)->height);
-	tile_dots(m, g, col, &((*node)->x_3), (*node)->height);
-	tile_dots(m, g, col, &((*node)->x_4), (*node)->height);
+//	tile_dots(m, g, col, node);
 	*node = (*node)->next;
 }
 
@@ -329,7 +461,13 @@ void	init_gfx(t_main *m, t_gfx *g)
 	t_color	color1;
 	char 	*temp;
 	t_list	*node;
+	t_pos	tst;
+	t_pos	tst2;
 
+	tst.x = 125;
+	tst.y = 500;
+	tst2.x = 250;
+	tst2.y = 250;
 	g->mlx = mlx_init();
 	g->win = mlx_new_window(g->mlx, SCR_X , SCR_Y, "mywindow");
 	g->img = mlx_new_image(g->mlx, SCR_X, SCR_Y);
@@ -340,7 +478,8 @@ void	init_gfx(t_main *m, t_gfx *g)
 	color1.r = 255;
 	color1.g = 0;
 	color1.b = 255;
-	draw(&m, &g, &node, &color1);
+	draw_lines(&color1, &g, &tst, &tst2);
+//	draw(&m, &g, &node, &color1);
 }
 
 int	main(int argc, char **argv)
