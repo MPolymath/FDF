@@ -6,7 +6,7 @@
 /*   By: mdiouf <mdiouf@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/22 20:06:54 by mdiouf            #+#    #+#             */
-/*   Updated: 2015/01/28 18:06:57 by mdiouf           ###   ########.fr       */
+/*   Updated: 2015/02/02 11:20:07 by mdiouf           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@ typedef struct	s_pos
 {
 	int				x;
 	int				y;
+	int				height;
 }				t_pos;
 
 typedef struct	s_list
