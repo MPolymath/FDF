@@ -6,7 +6,7 @@
 /*   By: mdiouf <mdiouf@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/19 14:40:05 by mdiouf            #+#    #+#             */
-/*   Updated: 2015/02/02 18:03:02 by mdiouf           ###   ########.fr       */
+/*   Updated: 2015/02/03 18:45:05 by mdiouf           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -221,8 +221,8 @@ void	create_list(t_main *m, t_gfx *g)
 
 	x = 0;
 	y = 0;
-	x_incr = (SCR_X / (m->nb));
-	y_incr = SCR_Y / (m->lines);
+	x_incr = ((SCR_X) / (m->nb));
+	y_incr = (SCR_Y) / (m->lines);
 	while (y != m->lines)
 	{
 		while (x != m->nb)
@@ -268,89 +268,274 @@ void		draw_lines(t_color *col, t_gfx **g, t_pos *t, t_pos *t2)
 	int		x;
 	int		y;
 	int		i;
+	int		ch;
+	t_pos	*tpos;
 	t_pos	coord;
 	t_pos	coord2;
 	char	*temp;
 
 	i = 0;
+	tpos = t;
+	t = t2;
+	t2 = tpos;
+	ch = 0;
 //	coord = rot(t, .2, t->height);
 //	coord2 = rot(t2, .2, t->height);
 //	printf("%d,%d\n", coord.x, coord.y);
 //	printf("%d,%d\n", coord2.x, coord2.y);
 	x = t->x;
-//	printf("test\n");
-//	printf("%d\n");
-//	printf("TOTO\n");
-//	sx = (500 * (((*node)->x_1.x) - 500)) / (500 + (10) + 500);
+//	sx = (500 * (((*nodes)->x_1.x) - 500)) / (500 + (10) + 500);
 //	sx += 253;
 //	sy = (500 * (((*node)->x_1.y) - 500)) / (500 + ((*node)->x_1.y) + 500);
 //	sy += 250;
 //	if ((t->x <= t2->x) && ((t2->x - t->x) >= fabs((double)(t2->y) - t->y)))
 //	{
-		while (1)
-		{
-			if ((t->y - t2->y) < 0)
+		printf("t->y: %d t->x: %d\n", t->y, t->x);
+		printf("t2->y: %d t2->x: %d\n", t2->y, t2->x);
+//		while (1)
+//		{
+			if ((t2->y - t->y) > 0)
 			{
-//				x = t2->x;
-//				printf("case1\n");
-				while (x <= t2->x /*&& x <= SCR_X*/)
+				if (t2->x > t->x)
 				{
-//					if (x > SCR_X || coord.x > SCR_X || coord.y > SCR_Y)
-//						break;
-					printf("x: %d\ny: %d\n", x, t->y);
-					printf("x: %d\ny: %d\n", t2->x, t2->y);
-					temp = (*g)->add_img;
-					i = ((*(*g)->sz_ln) * (((t2->y - t->y) / (t2->x - t->x)) * (x - t->x) + t->y)) + (((*(*g)->bpx) / 8) * x);
-//					i = ((*((*g)->bpx) / 8) * ((x)) + ((*(*g)->sz_ln) * (((t2->y - t->y) / (t2->x) - (t->x)) * (x - t->x) + t->y))); // only change
-					printf("%d\n", i);
-					if (i >= 0)
+					while (x <= t2->x && x < SCR_X)
 					{
-//						printf("%d\n", i);
-						temp = temp += i;
-						*temp = col->b;
-						temp++;
-						*temp = col->g;
-						temp++;
-						*temp = col->r;
+						printf("test\n");
+//						if (x > SCR_X || coord.x > SCR_X || coord.y > SCR_Y)
+//							break;
+//						printf("case1\n");x
+//						printf("t->y: %d t->x: %d\n", t->y, t->x);
+//						printf("t2->y: %d t2->x: %d\n", t2->y, t2->x);
 						temp = (*g)->add_img;
+						i = ((*(*g)->sz_ln) * (((t2->y - t->y) / (t2->x - t->x)) * (x - t->x) + t->y)) + (((*(*g)->bpx) / 8) * x);
+//						printf("%d\n", i);
+						if (i >= 0)
+						{
+							temp = temp += i;
+							*temp = col->b;
+							temp++;
+							*temp = col->g;
+							temp++;
+							*temp = col->r;
+							temp = (*g)->add_img;
+						}
+						x++;
+//					i = i + ((*(*g)->sz_ln));
+//						mlx_put_image_to_window((*g)->mlx, (*g)->win, (*g)->img, 0, 0);
+//					sleep(1);
 					}
-					x++;
-					mlx_put_image_to_window((*g)->mlx, (*g)->win, (*g)->img, 0, 0);
-					sleep(1);
 				}
-
+				else if (t2->x < t->x)
+				{
+					printf("test1\n");
+					while (x >= t2->x && x < SCR_X)
+					{
+//						if (x > SCR_X || coord.x > SCR_X || coord.y > SCR_Y)
+//							break;
+//						printf("case1\n");x
+//						printf("t->y: %d t->x: %d\n", t->y, t->x);
+//						printf("t2->y: %d t2->x: %d\n", t2->y, t2->x);
+						temp = (*g)->add_img;
+						i = ((*(*g)->sz_ln) * (((t2->y - t->y) / (t2->x - t->x)) * (x - t->x) + t->y)) + (((*(*g)->bpx) / 8) * x);
+//						printf("%d\n", i);
+						if (i >= 0)
+						{
+							temp = temp += i;
+							*temp = col->b;
+							temp++;
+							*temp = col->g;
+							temp++;
+							*temp = col->r;
+							temp = (*g)->add_img;
+						}
+						x--;
+//					i = i + ((*(*g)->sz_ln));
+//						mlx_put_image_to_window((*g)->mlx, (*g)->win, (*g)->img, 0, 0);
+//					sleep(1);
+					}
+				}
+				else
+				{
+					x = t->y;
+					printf("test2\n");
+					if (t->y > t2->y)
+					{
+						while (x >= t2->y && x <= SCR_Y)
+						{
+//							if (x > SCR_X || coord.x > SCR_X || coord.y > SCR_Y)
+//								break;
+//							printf("case1\n");x
+//							printf("t->y: %d t->x: %d\n", t->y, t->x);
+//							printf("t2->y: %d t2->x: %d\n", t2->y, t2->x);
+							temp = (*g)->add_img;
+							i = (((*(*g)->sz_ln)) * (((0) * (x - t->y) + t->x)) + (((*(*g)->bpx) / 8) * x));
+//							i = ((*(*g)->sz_ln) * (((t2->y - t->y) / (t2->x - t->x)) * (x - t->x) + t->y)) + (((*(*g)->bpx) / 8) * x);
+//							printf("%d\n", i);
+							if (i >= 0)
+							{
+								temp = temp += i;
+								*temp = col->b;
+								temp++;
+								*temp = col->g;
+								temp++;
+								*temp = col->r;
+								temp = (*g)->add_img;
+							}
+							x--;
+//							i = i + ((*(*g)->sz_ln));
+//							mlx_put_image_to_window((*g)->mlx, (*g)->win, (*g)->img, 0, 0);
+//							sleep(1);
+						}
+					}
+					else
+					{
+						while (x <= t2->y && x < SCR_Y)
+						{
+//							if (x > SCR_X || coord.x > SCR_X || coord.y > SCR_Y)
+//								break;
+//							printf("case1\n");x
+//							printf("t->y: %d t->x: %d\n", t->y, t->x);
+//							printf("t2->y: %d t2->x: %d\n", t2->y, t2->x);
+							temp = (*g)->add_img;
+							i = (((*(*g)->sz_ln)) * (((0) * (x - t->y) + t->x)) + (((*(*g)->bpx) / 8) * x));
+//							i = ((*(*g)->sz_ln) * (((t2->y - t->y) / (t2->x - t->x)) * (x - t->x) + t->y)) + (((*(*g)->bpx) / 8) * x);
+//							printf("%d\n", i);
+							if (i >= 0)
+							{
+								temp = temp += i;
+								*temp = col->b;
+								temp++;
+								*temp = col->g;
+								temp++;
+								*temp = col->r;
+								temp = (*g)->add_img;
+							}
+							x++;
+//							i = i + ((*(*g)->sz_ln));
+//							mlx_put_image_to_window((*g)->mlx, (*g)->win, (*g)->img, 0, 0);
+//							sleep(1);
+						}
+					}
+				}
 			}
 			else
 			{
+//				x = t->y;
+				x = t->y;
+//				i = ((*(*g)->bpx / 8) * (((t2->y - t->y) / (t2->x - t->x)) * (x - t->y) + t->x)) + ((*(*g)->sz_ln) * x);
+//				x = t->x;
 				printf("case2\n");
-//				printf("x_1: %d,%d x_2:%d,%d\n", t->x,t->y, t2->x,t2->y);
-				x =  t->y;
-				while (x <= t2->y /*&& x <= SCR_Y*/)
+				printf("t->y: %d t->x: %d\n", t->y, t->x);
+				printf("t2->y: %d t2->x: %d\n", t2->y, t2->x);
+				if (t2->y > t->y)
 				{
-//					i1f (x > SCR_X || t->x > SCR_X || t->y > SCR_Y)
-//						break;
-					temp = (*g)->add_img;
-					i = (((*(*g)->sz_ln) * (x)) + ((*((*g)->bpx) / 8) * ((t2->x) - t->x) / ((t2->y) - t->y)) * ((x - t->y) + t->x)); // only change
-//					i = (*((*g)->bpx) / 8) * ((x)) + (((*(*g)->sz_ln)) * ((t->y + ((t2->y) - (t->y)) * (x - t2->x))/((t2->x) - (t->x)))); // only change
-					printf("i2: %d\n", i);
-					if (i >= 0)
+					printf("test11\n");
+					while (x <= t2->y && x < SCR_Y)
 					{
-//					printf("i2: %d\n", i);
-					temp = temp += i;
-					*temp = col->b;
-					temp++;
-					*temp = col->g;
-					temp++;
-					*temp = col->r;
-					temp = (*g)->add_img;
+//						if (x > SCR_X || coord.x > SCR_X || coord.y > SCR_Y)
+//							break;
+						temp = (*g)->add_img;
+						i = (((*(*g)->bpx) / 8) * (((t2->x - t->x) / (t2->y - t->y)) * (x - t->y) + t->x)) + ((*(*g)->sz_ln) * x);
+						printf("%d\n", i);
+						if (i >= 0)
+						{
+							temp = temp += i;
+							*temp = col->b;
+							temp++;
+							*temp = col->g;
+							temp++;
+							*temp = col->r;
+							temp = (*g)->add_img;
+						}
+						x++;
+//						i = i + ((*(*g)->bpx) / 8);
+//						mlx_put_image_to_window((*g)->mlx, (*g)->win, (*g)->img, 0, 0);
 					}
-					x++;
-					mlx_put_image_to_window((*g)->mlx, (*g)->win, (*g)->img, 0, 0);
-//					sleep(1);
-				}
 
+				}
+				else if (t2->y < t->y)
+				{
+					printf("test22\n");
+					while (x >= t2->y && x < SCR_Y)
+					{
+//						if (x > SCR_X || coord.x > SCR_X || coord.y > SCR_Y)
+//							break;
+						temp = (*g)->add_img;
+						i = (((*(*g)->bpx / 8)) * (((t2->x - t->x) / (t2->y - t->y)) * (x - t->y) + t->x)) + ((*(*g)->sz_ln) * x);
+						printf("%d\n", i);
+						if (i >= 0)
+						{
+							temp = temp += i;
+							*temp = col->b;
+							temp++;
+							*temp = col->g;
+							temp++;
+							*temp = col->r;
+							temp = (*g)->add_img;
+						}
+						x--;
+//						i = i + ((*(*g)->bpx) / 8);
+//						mlx_put_image_to_window((*g)->mlx, (*g)->win, (*g)->img, 0, 0);
+					}
+
+				}
+				else
+				{
+					x = t->x;
+					printf("test33\n");
+					if (t2->x > t->x)
+					{
+						while (x <= t2->x && x < SCR_X)
+						{
+//							if (x > SCR_X || coord.x > SCR_X || coord.y > SCR_Y)
+//								break;
+							temp = (*g)->add_img;
+							i = (((*(*g)->sz_ln)) * (((0) * (x - t->x) + (t->y))) + (((*(*g)->bpx) / 8) * x));
+							printf("%d\n", i);
+							if (i >= 0)
+							{
+								temp = temp += i;
+								*temp = col->b;
+								temp++;
+								*temp = col->g;
+								temp++;
+								*temp = col->r;
+								temp = (*g)->add_img;
+							}
+							x++;
+//							i = i + ((*(*g)->bpx) / 8);
+//							mlx_put_image_to_window((*g)->mlx, (*g)->win, (*g)->img, 0, 0);
+						}
+					}
+					else
+					{
+						printf("TOTO\n");
+						while (x >= t2->x && x <= SCR_X)
+						{
+//							if (x > SCR_X || coord.x > SCR_X || coord.y > SCR_Y)
+//								break;
+							temp = (*g)->add_img;
+							i = (((*(*g)->sz_ln)) * (((0) * (x - t->x) + (t->y))) + (((*(*g)->bpx) / 8) * x));
+							printf("%d\n", i);
+							if (i >= 0)
+							{
+								temp = temp += i;
+								*temp = col->b;
+								temp++;
+								*temp = col->g;
+								temp++;
+								*temp = col->r;
+								temp = (*g)->add_img;
+							}
+							x--;
+//							i = i + ((*(*g)->bpx) / 8);
+//							mlx_put_image_to_window((*g)->mlx, (*g)->win, (*g)->img, 0, 0);
+						}
+					}
+				}
+				printf("%d\n", t->y);
 			}
-		}
+//		}
 //	}
 }
 
@@ -366,13 +551,13 @@ void		tile_dots(t_main **m, t_gfx **g, t_color **col, t_list **node)
 //	sy = (500 * (((*node)->x_1.y) - 500)) / (500 + ((*node)->x_1.y) + 500);
 //	sy += 250;
 //	printf("sx: %d sy: %d\n", sx, sy);
-	if (sx < 0 || sy < 0)
-		return;
-	draw_lines(*col, g, &(*node)->x_1, &(*node)->x_2);
+//	if (sx < 0 || sy < 0)
+//		return;
 //	printf("x_1: %d,%d x_2: %d,%d x_3: %d,%d x_4: %d,%d\n", (*node)->x_1.x,(*node)->x_1.y,(*node)->x_2.x,(*node)->x_2.y,(*node)->x_3.x,(*node)->x_3.y, (*node)->x_4.x,(*node)->x_4.y);
-//	draw_lines(*col, g, &(*node)->x_2, &(*node)->x_4);
-//	draw_lines(*col, g, &(*node)->x_1, &(*node)->x_3);
-//	draw_lines(*col, g, &(*node)->x_3, &(*node)->x_4);
+	draw_lines(*col, g, &(*node)->x_1, &(*node)->x_2);
+	draw_lines(*col, g, &(*node)->x_2, &(*node)->x_4);
+	draw_lines(*col, g, &(*node)->x_1, &(*node)->x_3);
+	draw_lines(*col, g, &(*node)->x_3, &(*node)->x_4);
 //	temp = (*g)->add_img;
 //	i = (*((*g)->bpx) / 8) * ((x->x)) + (((*(*g)->sz_ln)) * ((x->y)));
 //	temp = temp += i;
@@ -431,11 +616,11 @@ void	draw(t_main **m, t_gfx **g, t_list **node, t_color *col)
 //				break;
 //		}
 //		printf("x_1: %d,%d x_2: %d,%d x_3: %d,%d x_4: %d,%d\n", (*node)->x_1.x, (*node)->x_1.y, (*node)->x_2.x, (*node)->x_2.y, (*node)->x_3.x, (*node)->x_3.y, (*node)->x_4.x, (*node)->x_4.y);
-/*		corners(m, g, node, &col);
+		corners(m, g, node, &col);
 		*node = (*node)->next;
 		while (*node != (*m)->start)
 		{
-		if ((*node)->next != (*m)->start  && (/*((*node)->next->height > (*node)->height) ||*//*((*node)->next->height < (*node)->height)))
+			if ((*node)->next != (*m)->start  /*&& (((*node)->next->height > (*node)->height) ||*//*((*node)->next->height < (*node)->height))*/)
 			{
 				temp.x_1 = (*node)->x_1;
 				temp.x_2 = (*node)->next->x_2;
@@ -449,7 +634,7 @@ void	draw(t_main **m, t_gfx **g, t_list **node, t_color *col)
 				corners(m, g, node, &col);
 			*node = (*node)->next;
 		}
-		mlx_put_image_to_window((*g)->mlx, (*g)->win, (*g)->img, 0, 0);*/
+		mlx_put_image_to_window((*g)->mlx, (*g)->win, (*g)->img, 0, 0);
 //		printf("m->j - (sz_ln * 2): %d\n", m->j - (*(g->sz_ln) * 2));
 		sleep(100);
 	}
@@ -466,8 +651,8 @@ void	init_gfx(t_main *m, t_gfx *g)
 	t_pos	tst;
 	t_pos	tst2;
 
-	tst.x = 125;
-	tst.y = 500;
+	tst.x = 250;
+	tst.y = 0;
 	tst2.x = 250;
 	tst2.y = 250;
 	g->mlx = mlx_init();
@@ -480,7 +665,12 @@ void	init_gfx(t_main *m, t_gfx *g)
 	color1.r = 255;
 	color1.g = 0;
 	color1.b = 255;
-	draw_lines(&color1, &g, &tst, &tst2);
+	while (1)
+	{
+		draw_lines(&color1, &g, &tst, &tst2);
+		mlx_put_image_to_window((g)->mlx, (g)->win, (g)->img, 0, 0);
+		sleep(1000);
+	}
 //	draw(&m, &g, &node, &color1);
 }
 
