@@ -6,7 +6,7 @@
 /*   By: mdiouf <mdiouf@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/22 20:06:54 by mdiouf            #+#    #+#             */
-/*   Updated: 2015/02/02 11:20:07 by mdiouf           ###   ########.fr       */
+/*   Updated: 2015/02/06 09:11:22 by mdiouf           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,12 @@
 #define SCR_X 500
 #define SCR_Y 500
 
-typedef struct	s_color
+typedef struct	s_rmat
+{
+	double		mt[4][4];
+}				t_rmat;
+
+typedef struct	t_color
 {
 	int			r;
 	int			g;
