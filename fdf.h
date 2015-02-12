@@ -6,7 +6,7 @@
 /*   By: mdiouf <mdiouf@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/22 20:06:54 by mdiouf            #+#    #+#             */
-/*   Updated: 2015/02/06 09:11:22 by mdiouf           ###   ########.fr       */
+/*   Updated: 2015/02/12 02:14:57 by mdiouf           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,7 @@ typedef struct	s_main
 	char			*line;
 	char			*join_lines;
 	t_list			*start;
+	t_list			*start2;
 }				t_main;
 
 typedef struct	s_gfx
@@ -83,5 +84,6 @@ typedef struct	s_gfx
 	int				n;
 	unsigned int	color;
 	char			*add_img;
+	t_rmat			mt[4][4];
 }				t_gfx;
 #endif

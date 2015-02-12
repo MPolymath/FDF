@@ -6,7 +6,7 @@
 /*   By: mdiouf <mdiouf@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/19 14:40:05 by mdiouf            #+#    #+#             */
-/*   Updated: 2015/02/06 16:27:05 by mdiouf           ###   ########.fr       */
+/*   Updated: 2015/02/12 02:14:31 by mdiouf           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,14 +107,17 @@ void	init_main(t_main *m, t_gfx *g)
 	g->color = 0;
 }
 
-void	cr_frst(t_main **m, t_list **elem)
+void	cr_frst(t_main **m, t_list **elem, t_list **elem2)
 {
 	(*elem)->prev = NULL;
 	(*elem)->next = NULL;
 	(*m)->start = *elem;
+	(*elem2)->prev = NULL;
+	(*elem2)->next = NULL;
+	(*m)->start2 = *elem2;
 }
 
-void	if_nt_frst(t_list **elem, t_list **temp, t_main **m)
+void	if_nt_frst(t_list **elem, t_list **elem2, t_list **temp, t_main **m)
 {
 	*temp = (*m)->start;
 	if ((*temp)->next == NULL)
@@ -134,14 +137,35 @@ void	if_nt_frst(t_list **elem, t_list **temp, t_main **m)
 		(*elem)->next = (*m)->start;
 		(*m)->start->prev = *elem;
 	}
+
+	*temp = (*m)->start2;
+	if ((*temp)->next == NULL)
+	{
+		(*temp)->next = *elem2;
+		(*temp)->prev = *elem2;
+		(*elem2)->next = *temp;
+		(*elem2)->prev = *temp;
+	}
+	else
+	{
+		*temp = (*temp)->next;
+		while ((*temp)->next != (*m)->start2)
+			*temp = (*temp)->next;
+		(*temp)->next = *elem2;
+		(*elem2)->prev = *temp;
+		(*elem2)->next = (*m)->start2;
+		(*m)->start->prev = *elem2;
+	}
 }
 
 void	create_new_elem(t_info *inf, t_main **m)
 {
 	t_list	*elem;
+	t_list	*elem2;
 	t_list	*temp;
 
 	elem = malloc(sizeof(t_list));
+	elem2 = malloc(sizeof(t_list));
 	elem->x_1.x = (inf->x * inf->x_incr);
 	elem->x_1.y = (inf->y * inf->y_incr);
 	elem->x_2.x = ((inf->x + 1) * inf->x_incr);
@@ -155,10 +179,24 @@ void	create_new_elem(t_info *inf, t_main **m)
 	elem->x_2.height = inf->height;
 	elem->x_3.height = inf->height;
 	elem->x_4.height = inf->height;
+
+	elem2->x_1.x = (inf->x * inf->x_incr);
+	elem2->x_1.y = (inf->y * inf->y_incr);
+	elem2->x_2.x = ((inf->x + 1) * inf->x_incr);
+	elem2->x_2.y = (inf->y * inf->y_incr);
+	elem2->x_3.x = (inf->x  * inf->x_incr);
+	elem2->x_3.y = ((inf->y + 1) * inf->y_incr);
+	elem2->x_4.x = ((inf->x + 1)  * inf->x_incr);
+	elem2->x_4.y = ((inf->y + 1) * inf->y_incr);
+	elem2->height = inf->height;
+	elem2->x_1.height = inf->height;
+	elem2->x_2.height = inf->height;
+	elem2->x_3.height = inf->height;
+	elem2->x_4.height = inf->height;
 	if (inf->x == 0 && inf->y == 0)
-		cr_frst(m, &elem);
+		cr_frst(m, &elem, &elem2);
 	else
-		if_nt_frst(&elem, &temp, m);
+		if_nt_frst(&elem, &elem2, &temp, m);
 }
 
 void		print_xs_b(t_list **temp)
@@ -302,6 +340,60 @@ void		rot_mat_fill(t_rmat *m_final, double ax, double ay, double az)
 
 }
 
+void		conv_pos(t_pos *pos, t_gfx **g)
+{
+	int	x;
+	int	y;
+	int z;
+
+	x = (int)(((m_final.mt[0][0]) * pos->x) + (m_final.mt[0][1] * pos->y) + (m_final.mt[0][2] * pos->height));
+	y = (int)(((m_final.mt[1][0]) * pos->x) + (m_final.mt[1][1] * pos->y) + (m_final.mt[1][2] * pos->height));
+	z = (int)(((m_final.mt[2][0]) * pos->x) + (m_final.mt[2][1] * t->y) + (m_final.mt[2][2] * pos->height));
+	pos->x = x;
+	pos->y = y;
+	pos->height = z;
+}
+
+void		convert_list2(t_main **m, t_gfx **g)
+{
+	t_list	*temp;
+	t_list	*temp2;
+	int		cycle;
+
+	cycle = 0;
+	temp = (*m)->start;
+	temp2 = (*m)->start2;
+	temp = temp->next;
+	while (temp != (*m)->start)
+	{
+		*temp2 = *temp;
+		if (cycle == 0)
+		{
+			temp = (*m)->start;
+			cycle = 1;
+		}
+		temp = temp->next;
+		temp2 = temp2->next;
+	}
+	cycle = 0;
+	temp2 = (*m)->start2;
+	temp2 = temp2->next;
+	rot_mat_fill(&m_final, 25, 0, 0);
+	while (temp2 != (*m)->start2)
+	{
+		if (cycle == 0)
+		{
+			temp2 = (*m)->start2;
+			cycle = 1;
+		}
+		conv_pos(&(temp2->x_1), g));
+		conv_pos(&(temp2->x_2), g));
+		conv_pos(&(temp2->x_3), g));
+		conv_pos(&(temp2->x_4), g));
+		temp2 = temp2->next;
+	}
+}
+
 void		draw_lines(t_color *col, t_gfx **g, t_pos *t, t_pos *t2)
 {
 	int		x;
@@ -328,13 +420,19 @@ void		draw_lines(t_color *col, t_gfx **g, t_pos *t, t_pos *t2)
 	coord = *t;
 	coord2 = *t2;
 	x = coord.x;
-	rot_mat_fill(&m_final, 25, 0, 0);
-	coord.x = (int)(((m_final.mt[0][0]) * t->x) + (m_final.mt[0][1] * t->y) + (m_final.mt[0][2] * t->height));
-	coord.y = (int)(((m_final.mt[1][0]) * t->x) + (m_final.mt[1][1] * t->y) + (m_final.mt[1][2] * t->height));
-	coord.height = (int)(((m_final.mt[2][0]) * t->x) + (m_final.mt[2][1] * t->y) + (m_final.mt[2][2] * t->height));
-	coord2.x = (int)(((m_final.mt[0][0]) * t2->x) + (m_final.mt[0][1] * t2->y) + (m_final.mt[0][2] * t2->height));
-	coord2.y = (int)(((m_final.mt[1][0]) * t2->x) + (m_final.mt[1][1] * t2->y) + (m_final.mt[1][2] * t2->height));
-	coord2.height = (int)(((m_final.mt[2][0]) * t2->x) + (m_final.mt[2][1] * t2->y) + (m_final.mt[2][2] * t2->height));
+    rot_mat_fill(&m_final, 25, 0, 0);
+    coord.x = (int)(((m_final.mt[0][0]) * t->x) + (m_final.mt[0][1] * t->y) + (m_final.mt[0][2] * t->height\
+						));
+    coord.y = (int)(((m_final.mt[1][0]) * t->x) + (m_final.mt[1][1] * t->y) + (m_final.mt[1][2] * t->height\
+						));
+    coord.height = (int)(((m_final.mt[2][0]) * t->x) + (m_final.mt[2][1] * t->y) + (m_final.mt[2][2] * t->h\
+																					eight));
+    coord2.x = (int)(((m_final.mt[0][0]) * t2->x) + (m_final.mt[0][1] * t2->y) + (m_final.mt[0][2] * t2->he\
+																				  ight));
+    coord2.y = (int)(((m_final.mt[1][0]) * t2->x) + (m_final.mt[1][1] * t2->y) + (m_final.mt[1][2] * t2->he\
+																				  ight));
+    coord2.height = (int)(((m_final.mt[2][0]) * t2->x) + (m_final.mt[2][1] * t2->y) + (m_final.mt[2][2] * t\
+																					   2->height));
 /*	i = ((*(*g)->sz_ln) * (((coord2.y - coord.y) / (coord2.x - coord.x)) * (x - coord.x) + coord.y)) + (((*(*g)->bpx) / 8) * x);
 	if (i >= 0)
 	{
