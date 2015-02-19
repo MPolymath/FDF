@@ -6,7 +6,7 @@
 /*   By: mdiouf <mdiouf@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/22 20:06:54 by mdiouf            #+#    #+#             */
-/*   Updated: 2015/02/12 02:14:57 by mdiouf           ###   ########.fr       */
+/*   Updated: 2015/02/19 11:59:23 by mdiouf           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,8 +82,18 @@ typedef struct	s_gfx
 	int				*ndian;
 	int				k;
 	int				n;
+	int				min_x;
+	int				min_y;
+	int				min_z;
+	int				max_x;
+	int				max_y;
+	int				max_z;
+	int				mid_x;
+	int				mid_y;
+	int				mid_z;
+	int				height;
 	unsigned int	color;
 	char			*add_img;
-	t_rmat			mt[4][4];
+	t_rmat			mat;
 }				t_gfx;
 #endif
